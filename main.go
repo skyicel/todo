@@ -22,14 +22,13 @@ func main() {
 	}
 
 	command := os.Args
-
-	data := storage.LoadTask()
+	data := storage.LoadTasks()
 
 	switch command[1] {
 	case ADD:
 		nTask := models.CreateTask(command[2])
 		data = add.AddTask(nTask, data)
-		list.PrintList(data)
+		storage.SaveTasks(data)
 	case LIST:
 		list.PrintList(data)
 	case COMPLETE:
