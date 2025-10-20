@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	add "todo/cmd"
-	list "todo/cmd"
+	"strconv"
+	"todo/cmd"
 	"todo/models"
 	"todo/storage"
 )
@@ -26,20 +26,28 @@ func main() {
 
 	switch command[1] {
 	case ADD:
-		nTask := models.CreateTask(command[2])
-		data = add.AddTask(nTask, data)
-		storage.SaveTasks(data)
+		nTask := models.CreateTask(command[2], data)
+		data = cmd.AddTask(nTask, data)
 	case LIST:
-		list.PrintList(data)
+		cmd.PrintList(data)
 	case COMPLETE:
-		fmt.Print(COMPLETE)
+		ID, _ := strconv.Atoi(command[2])
+
+		cmd.CompleteTask(ID, &data)
 	case DELETE:
-		fmt.Print(DELETE)
+		ID, _ := strconv.Atoi(command[2])
+
+		fmt.Print("\n\n\n")
+
+		data = cmd.DeleteTask(ID, data)
+
 	case HELP:
 		fmt.Print(HELP)
 	default:
 		fmt.Print(HELP)
 	}
+
+	storage.SaveTasks(data)
 }
 
 func showhelp() {

@@ -1,11 +1,10 @@
-package add
+package cmd
 
 import (
 	"todo/models"
-	"todo/storage"
 )
 
-func PrintList(list storage.List) {
+func PrintList(list []models.Task) {
 	for _, elem := range list {
 		models.PrintTask(elem)
 	}

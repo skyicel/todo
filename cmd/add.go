@@ -1,11 +1,10 @@
-package add
+package cmd
 
 import (
 	"todo/models"
-	"todo/storage"
 )
 
-func AddTask(task models.Task, list storage.List) storage.List {
+func AddTask(task models.Task, list []models.Task) []models.Task {
 	list = append(list, task)
 	return list
 }
