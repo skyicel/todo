@@ -1,50 +1,45 @@
 package storage
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
-	"time"
 	"todo/models"
 )
 
-var FILELISTNAME string = "list.txt"
+var FILELISTNAME string = "todo.json"
 
 func LoadTasks() ([]models.Task, error) {
-	var list []models.Task
+	var tasks []models.Task
 
 	file, err := os.OpenFile(FILELISTNAME, os.O_RDONLY|os.O_CREATE, 0666)
 
 	if err != nil {
-		return nil, fmt.Errorf("LoadTask failed. File was not opened")
+		return []models.Task{}, fmt.Errorf("LoadTask failed. File was not opened")
 	}
 
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&tasks)
 
-	for scanner.Scan() {
-		list = append(list, models.CreateTaskFromFileString(scanner.Text()))
+	if err != nil {
+		return []models.Task{}, nil
 	}
 
-	return list, nil
+	return tasks, nil
 }
 
-func SaveTasks(TaskList []models.Task) {
+func SaveTasks(TaskList []models.Task) error {
 	file, err := os.OpenFile(FILELISTNAME, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 
 	if err != nil {
-		fmt.Print("error")
-		return
+		return err
 	}
 
 	defer file.Close()
 
-	for _, task := range TaskList {
-		strTask := []byte(strconv.Itoa(task.ID) + " " + task.Text +
-			" " + task.Status + " " + task.CreatedTime.Format(time.DateTime) + "\n")
-
-		file.Write(strTask)
-	}
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", " ")
+	return encoder.Encode(TaskList)
 }

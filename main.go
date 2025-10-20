@@ -53,7 +53,7 @@ func main() {
 			return
 		}
 
-		cmd.CompleteTask(ID, &data)
+		cmd.CompleteTask(ID, data)
 	case DELETE:
 		ID, err := strconv.Atoi(command[2])
 
