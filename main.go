@@ -22,34 +22,65 @@ func main() {
 	}
 
 	command := os.Args
-	data := storage.LoadTasks()
+	data, err := storage.LoadTasks()
+
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
 
 	switch command[1] {
 	case ADD:
-		nTask := models.CreateTask(command[2], data)
-		data = cmd.AddTask(nTask, data)
+		if len(os.Args) < 2 {
+			fmt.Println("error, you didn't enter text of task")
+			showhelp()
+			return
+		} else {
+			nTask := models.CreateTask(command[2:], data)
+			data = cmd.AddTask(nTask, data)
+		}
 	case LIST:
-		cmd.PrintList(data)
+		if len(data) != 0 {
+			cmd.PrintList(data)
+		} else {
+			fmt.Println("data is empty")
+		}
 	case COMPLETE:
-		ID, _ := strconv.Atoi(command[2])
+		ID, err := strconv.Atoi(command[2])
+
+		if err != nil {
+			fmt.Print("error! id is not int!")
+			return
+		}
 
 		cmd.CompleteTask(ID, &data)
 	case DELETE:
-		ID, _ := strconv.Atoi(command[2])
+		ID, err := strconv.Atoi(command[2])
 
-		fmt.Print("\n\n\n")
+		if err != nil {
+			fmt.Print("error! id is not int!")
+			return
+		}
 
 		data = cmd.DeleteTask(ID, data)
 
 	case HELP:
-		fmt.Print(HELP)
+		showhelp()
 	default:
-		fmt.Print(HELP)
+		fmt.Println("unknown command")
+		showhelp()
 	}
 
 	storage.SaveTasks(data)
 }
 
 func showhelp() {
-	fmt.Print("no arguement bro!")
+	fmt.Println("---------------")
+	fmt.Println("TODO COMMANDS")
+	fmt.Println("task{id, text, status, created time}")
+	fmt.Println("todo add [text] / add task to list")
+	fmt.Println("todo list / show list of tasks")
+	fmt.Println("todo complete [id] / make task complete")
+	fmt.Println("todo delete [id]")
+	fmt.Println("---------------")
 }

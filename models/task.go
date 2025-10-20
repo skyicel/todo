@@ -16,10 +16,10 @@ type Task struct {
 
 var LAYOUT = "2006-01-02 15:04:05"
 
-func CreateTask(text string, TaskList []Task) Task {
+func CreateTask(text []string, TaskList []Task) Task {
 	newTask := Task{
 		ID:          GetNextID(TaskList),
-		Text:        text,
+		Text:        strings.Join(text, " "),
 		Status:      "process",
 		CreatedTime: time.Now(),
 	}
@@ -34,13 +34,17 @@ func PrintTask(task Task) {
 // добавить ошибки если в строке меньше параметров, а потом вообще на json поменять
 
 func CreateTaskFromFileString(lineString string) Task {
+	if lineString == "\n" || lineString == "" {
+		return Task{}
+	}
+
 	params := strings.Split(lineString, " ")
 
 	idTask, _ := strconv.Atoi(params[0])
 
-	timeTask, _ := time.Parse(LAYOUT, params[3]+" "+params[4])
+	timeTask, _ := time.Parse(LAYOUT, params[len(params)-2]+" "+params[len(params)-1])
 
-	return Task{ID: idTask, Text: params[1], Status: params[2], CreatedTime: timeTask}
+	return Task{ID: idTask, Text: strings.Join(params[1:len(params)-3], " "), Status: params[len(params)-3], CreatedTime: timeTask}
 }
 
 func GetNextID(TaskList []Task) int {

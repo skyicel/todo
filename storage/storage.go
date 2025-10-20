@@ -11,13 +11,13 @@ import (
 
 var FILELISTNAME string = "list.txt"
 
-func LoadTasks() []models.Task {
+func LoadTasks() ([]models.Task, error) {
 	var list []models.Task
 
 	file, err := os.OpenFile(FILELISTNAME, os.O_RDONLY|os.O_CREATE, 0666)
 
 	if err != nil {
-		fmt.Print("TODO LIST cant open file error")
+		return nil, fmt.Errorf("LoadTask failed. File was not opened")
 	}
 
 	defer file.Close()
@@ -28,15 +28,11 @@ func LoadTasks() []models.Task {
 		list = append(list, models.CreateTaskFromFileString(scanner.Text()))
 	}
 
-	return list
+	return list, nil
 }
 
 func SaveTasks(TaskList []models.Task) {
 	file, err := os.OpenFile(FILELISTNAME, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-
-	for _, elem := range TaskList {
-		fmt.Println(elem.ID, elem.Text, elem.Status)
-	}
 
 	if err != nil {
 		fmt.Print("error")
@@ -50,7 +46,5 @@ func SaveTasks(TaskList []models.Task) {
 			" " + task.Status + " " + task.CreatedTime.Format(time.DateTime) + "\n")
 
 		file.Write(strTask)
-
-		fmt.Print("we are here")
 	}
 }
